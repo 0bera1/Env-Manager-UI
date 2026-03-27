@@ -1,0 +1,6 @@
+---
+description: 
+alwaysApply: true
+---
+
+- BUSINESS RULE’LARI SERVICE’E YAZ  -> controller → service → repository
