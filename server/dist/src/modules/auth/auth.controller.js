@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const auth_dto_1 = require("./auth.dto");
 const auth_service_1 = require("./auth.service");
 let AuthController = class AuthController {
@@ -30,6 +31,13 @@ let AuthController = class AuthController {
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Yeni kullanici kaydi olusturur' }),
+    (0, swagger_1.ApiBody)({ type: auth_dto_1.AuthRegisterDto }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Kayit basarili ve token dondu',
+        type: auth_dto_1.AuthTokenDto,
+    }),
+    (0, swagger_1.ApiConflictResponse)({ description: 'E-posta zaten kullanimda' }),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -37,6 +45,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Kullanici girisi yapar' }),
+    (0, swagger_1.ApiBody)({ type: auth_dto_1.AuthLoginDto }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Login basarili ve token dondu',
+        type: auth_dto_1.AuthTokenDto,
+    }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'E-posta veya sifre hatali' }),
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -44,6 +59,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, whitelist: true })),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
