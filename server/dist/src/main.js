@@ -13,12 +13,40 @@ async function bootstrap() {
     }));
     const swaggerConfig = new swagger_1.DocumentBuilder()
         .setTitle('Env Manager API')
-        .setDescription('Env Manager backend API dokumantasyonu')
+        .setDescription([
+        'Ortam degiskeni yonetimi backend API.',
+        '',
+        '- **Auth**: Kayit ve giris; basarili cevapta `accessToken` (JWT) doner.',
+        '- **Projects**: Ornek CRUD akisi; ileride korunan rotalar icin **Authorize** ile JWT kullanilabilir.',
+        '',
+        'Timestamps: ISO 8601 onerilir.',
+    ].join('\n'))
         .setVersion('1.0.0')
-        .addBearerAuth()
+        .addServer('http://localhost:3000', 'Yerel gelistirme')
+        .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Login veya register yanitindaki `accessToken`. Swagger\'da ustten Authorize → `Bearer <token>` veya sadece token yapistir.',
+    }, 'JWT-auth')
+        .addTag('App', 'Saglik / kok endpoint')
+        .addTag('Auth', 'Kayit, giris, JWT')
+        .addTag('Projects', 'Proje listeleme ve olusturma')
         .build();
-    const swaggerDocument = swagger_1.SwaggerModule.createDocument(app, swaggerConfig);
-    swagger_1.SwaggerModule.setup('docs', app, swaggerDocument);
+    const swaggerDocument = swagger_1.SwaggerModule.createDocument(app, swaggerConfig, {
+        operationIdFactory: (controllerKey, methodKey) => methodKey,
+    });
+    swagger_1.SwaggerModule.setup('docs', app, swaggerDocument, {
+        swaggerOptions: {
+            persistAuthorization: true,
+            docExpansion: 'list',
+            filter: true,
+            showRequestDuration: true,
+            tagsSorter: 'alpha',
+            operationsSorter: 'alpha',
+        },
+        customSiteTitle: 'Env Manager API Docs',
+    });
     await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

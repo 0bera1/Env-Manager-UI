@@ -2,6 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
+export interface CreateUserData {
+  email: string;
+  phone: string;
+  fullName?: string;
+  hashedPassword: string;
+}
+
 @Injectable()
 export class AuthRepository {
   public constructor(private readonly prismaService: PrismaService) {}
@@ -12,11 +19,19 @@ export class AuthRepository {
     });
   }
 
-  public async createUser(email: string, hashedPassword: string): Promise<User> {
+  public async findUserByPhone(phone: string): Promise<User | null> {
+    return this.prismaService.user.findUnique({
+      where: { phone },
+    });
+  }
+
+  public async createUser(data: CreateUserData): Promise<User> {
     return this.prismaService.user.create({
       data: {
-        email,
-        password: hashedPassword,
+        email: data.email,
+        phone: data.phone,
+        fullName: data.fullName,
+        password: data.hashedPassword,
       },
     });
   }

@@ -33,11 +33,13 @@ exports.AuthController = AuthController;
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Yeni kullanici kaydi olusturur' }),
     (0, swagger_1.ApiBody)({ type: auth_dto_1.AuthRegisterDto }),
-    (0, swagger_1.ApiOkResponse)({
-        description: 'Kayit basarili ve token dondu',
+    (0, swagger_1.ApiCreatedResponse)({
+        description: 'Kayit basarili; JWT access token',
         type: auth_dto_1.AuthTokenDto,
     }),
-    (0, swagger_1.ApiConflictResponse)({ description: 'E-posta zaten kullanimda' }),
+    (0, swagger_1.ApiConflictResponse)({
+        description: 'E-posta veya telefon numarasi zaten kullanimda',
+    }),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -51,7 +53,12 @@ __decorate([
         description: 'Login basarili ve token dondu',
         type: auth_dto_1.AuthTokenDto,
     }),
-    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'E-posta veya sifre hatali' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({
+        description: 'Kimlik bilgileri veya sifre hatali',
+    }),
+    (0, swagger_1.ApiBadRequestResponse)({
+        description: 'E-posta ve telefon ayni istekte gonderilemez veya alanlar gecersiz',
+    }),
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

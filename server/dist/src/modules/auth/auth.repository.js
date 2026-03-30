@@ -22,11 +22,18 @@ let AuthRepository = class AuthRepository {
             where: { email },
         });
     }
-    async createUser(email, hashedPassword) {
+    async findUserByPhone(phone) {
+        return this.prismaService.user.findUnique({
+            where: { phone },
+        });
+    }
+    async createUser(data) {
         return this.prismaService.user.create({
             data: {
-                email,
-                password: hashedPassword,
+                email: data.email,
+                phone: data.phone,
+                fullName: data.fullName,
+                password: data.hashedPassword,
             },
         });
     }

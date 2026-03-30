@@ -14,48 +14,83 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class AuthLoginDto {
     email;
+    phone;
     password;
 }
 exports.AuthLoginDto = AuthLoginDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({
+    (0, swagger_1.ApiPropertyOptional)({
         example: 'test@example.com',
-        description: 'Kullanici e-posta adresi',
+        description: 'E-posta ile giris (telefon ile birlikte kullanilamaz)',
     }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.ValidateIf)((o) => o.phone === undefined || o.phone.trim() === ''),
+    (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], AuthLoginDto.prototype, "email", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '+905551112233',
+        description: 'Telefon ile giris, E.164 veya ulke kodu dahil (TR)',
+    }),
+    (0, class_validator_1.ValidateIf)((o) => o.email === undefined || o.email.trim() === ''),
+    (0, class_validator_1.IsPhoneNumber)('TR'),
+    __metadata("design:type", String)
+], AuthLoginDto.prototype, "phone", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
-        example: '123456',
+        example: 'GucluSifre123',
         description: 'Kullanici sifresi',
+        minLength: 8,
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MaxLength)(128),
     __metadata("design:type", String)
 ], AuthLoginDto.prototype, "password", void 0);
 class AuthRegisterDto {
+    fullName;
     email;
+    phone;
     password;
 }
 exports.AuthRegisterDto = AuthRegisterDto;
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Yeni Kullanici',
+        description: 'Gorunen ad (istege bagli)',
+        maxLength: 120,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(120),
+    __metadata("design:type", String)
+], AuthRegisterDto.prototype, "fullName", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: 'newuser@example.com',
-        description: 'Kayit olacak kullanici e-posta adresi',
+        description: 'Kayit e-posta adresi',
     }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], AuthRegisterDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '123456',
-        description: 'Kayit olacak kullanici sifresi',
+        example: '+905551112233',
+        description: 'Kayit telefon numarasi (TR, benzersiz)',
+    }),
+    (0, class_validator_1.IsPhoneNumber)('TR'),
+    __metadata("design:type", String)
+], AuthRegisterDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'GucluSifre123',
+        description: 'En az 8 karakter',
+        minLength: 8,
     }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MaxLength)(128),
     __metadata("design:type", String)
 ], AuthRegisterDto.prototype, "password", void 0);
 class AuthTokenDto {

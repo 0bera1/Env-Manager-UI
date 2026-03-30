@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectDto = exports.CreateProjectDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateProjectDto {
     name;
@@ -17,11 +18,21 @@ class CreateProjectDto {
 }
 exports.CreateProjectDto = CreateProjectDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Uretim API',
+        description: 'Proje adi',
+        maxLength: 200,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'Projenin ait oldugu kullanici (User) kimligi',
+        format: 'uuid',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -32,4 +43,24 @@ class ProjectDto {
     userId;
 }
 exports.ProjectDto = ProjectDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '550e8400-e29b-41d4-a716-446655440001',
+        description: 'Proje kimligi',
+        format: 'uuid',
+    }),
+    __metadata("design:type", String)
+], ProjectDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Uretim API' }),
+    __metadata("design:type", String)
+], ProjectDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'Sahip kullanici kimligi',
+        format: 'uuid',
+    }),
+    __metadata("design:type", String)
+], ProjectDto.prototype, "userId", void 0);
 //# sourceMappingURL=project.dto.js.map

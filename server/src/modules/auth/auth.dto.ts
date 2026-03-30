@@ -1,39 +1,77 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MaxLength,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class AuthLoginDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'test@example.com',
-    description: 'Kullanici e-posta adresi',
+    description: 'E-posta ile giris (telefon ile birlikte kullanilamaz)',
   })
-  @IsString()
-  @IsNotEmpty()
-  public email!: string;
+  @ValidateIf((o: AuthLoginDto) => o.phone === undefined || o.phone.trim() === '')
+  @IsEmail()
+  public email?: string;
+
+  @ApiPropertyOptional({
+    example: '+905551112233',
+    description: 'Telefon ile giris, E.164 veya ulke kodu dahil (TR)',
+  })
+  @ValidateIf((o: AuthLoginDto) => o.email === undefined || o.email.trim() === '')
+  @IsPhoneNumber('TR')
+  public phone?: string;
 
   @ApiProperty({
-    example: '123456',
+    example: 'GucluSifre123',
     description: 'Kullanici sifresi',
+    minLength: 8,
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(8)
+  @MaxLength(128)
   public password!: string;
 }
 
 export class AuthRegisterDto {
+  @ApiPropertyOptional({
+    example: 'Yeni Kullanici',
+    description: 'Gorunen ad (istege bagli)',
+    maxLength: 120,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  public fullName?: string;
+
   @ApiProperty({
     example: 'newuser@example.com',
-    description: 'Kayit olacak kullanici e-posta adresi',
+    description: 'Kayit e-posta adresi',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsEmail()
   public email!: string;
 
   @ApiProperty({
-    example: '123456',
-    description: 'Kayit olacak kullanici sifresi',
+    example: '+905551112233',
+    description: 'Kayit telefon numarasi (TR, benzersiz)',
+  })
+  @IsPhoneNumber('TR')
+  public phone!: string;
+
+  @ApiProperty({
+    example: 'GucluSifre123',
+    description: 'En az 8 karakter',
+    minLength: 8,
   })
   @IsString()
-  @IsNotEmpty()
+  @MinLength(8)
+  @MaxLength(128)
   public password!: string;
 }
 

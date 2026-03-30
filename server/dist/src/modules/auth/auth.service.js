@@ -22,24 +22,58 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(payload) {
-        const existingUser = await this.authRepository.findUserByEmail(payload.email);
-        if (existingUser !== null) {
+        const email = this.normalizeEmail(payload.email);
+        const phone = this.normalizePhone(payload.phone);
+        const existingByEmail = await this.authRepository.findUserByEmail(email);
+        if (existingByEmail !== null) {
             throw new common_1.ConflictException('Bu e-posta adresi zaten kullaniliyor.');
         }
+        const existingByPhone = await this.authRepository.findUserByPhone(phone);
+        if (existingByPhone !== null) {
+            throw new common_1.ConflictException('Bu telefon numarasi zaten kullaniliyor.');
+        }
         const hashedPassword = this.hashPassword(payload.password);
-        const createdUser = await this.authRepository.createUser(payload.email, hashedPassword);
-        return this.createTokenResponse(createdUser.id, createdUser.email);
+        const createdUser = await this.authRepository.createUser({
+            email,
+            phone,
+            fullName: payload.fullName,
+            hashedPassword,
+        });
+        return this.createTokenResponse(createdUser.id, createdUser.email, createdUser.phone);
     }
     async login(payload) {
-        const user = await this.authRepository.findUserByEmail(payload.email);
+        const password = payload.password;
+        const emailRaw = payload.email;
+        const phoneRaw = payload.phone;
+        const emailPresent = emailRaw !== undefined && emailRaw.trim().length > 0;
+        const phonePresent = phoneRaw !== undefined && phoneRaw.trim().length > 0;
+        if (emailPresent && phonePresent) {
+            throw new common_1.BadRequestException('E-posta ve telefon ayni istekte birlikte gonderilemez.');
+        }
+        let user;
+        if (emailPresent && emailRaw !== undefined) {
+            user = await this.authRepository.findUserByEmail(this.normalizeEmail(emailRaw));
+        }
+        else if (phonePresent && phoneRaw !== undefined) {
+            user = await this.authRepository.findUserByPhone(this.normalizePhone(phoneRaw));
+        }
+        else {
+            throw new common_1.BadRequestException('Giris icin ya e-posta ya da telefon numarasi gonderilmelidir.');
+        }
         if (user === null) {
-            throw new common_1.UnauthorizedException('E-posta veya sifre hatali.');
+            throw new common_1.UnauthorizedException('Gecersiz kimlik bilgileri veya sifre hatali.');
         }
-        const isPasswordValid = this.verifyPassword(payload.password, user.password);
+        const isPasswordValid = this.verifyPassword(password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('E-posta veya sifre hatali.');
+            throw new common_1.UnauthorizedException('Gecersiz kimlik bilgileri veya sifre hatali.');
         }
-        return this.createTokenResponse(user.id, user.email);
+        return this.createTokenResponse(user.id, user.email, user.phone);
+    }
+    normalizeEmail(email) {
+        return email.trim().toLowerCase();
+    }
+    normalizePhone(phone) {
+        return phone.trim();
     }
     hashPassword(password) {
         const salt = (0, crypto_1.randomBytes)(16).toString('hex');
@@ -61,10 +95,11 @@ let AuthService = class AuthService {
         }
         return (0, crypto_1.timingSafeEqual)(originalBuffer, recalculatedBuffer);
     }
-    createTokenResponse(userId, email) {
+    createTokenResponse(userId, email, phone) {
         const accessToken = this.jwtService.sign({
             sub: userId,
             email,
+            phone,
         });
         return { accessToken };
     }

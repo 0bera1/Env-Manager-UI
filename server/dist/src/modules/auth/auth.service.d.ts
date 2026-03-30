@@ -7,6 +7,8 @@ export declare class AuthService {
     constructor(authRepository: AuthRepository, jwtService: JwtService);
     register(payload: AuthRegisterDto): Promise<AuthTokenDto>;
     login(payload: AuthLoginDto): Promise<AuthTokenDto>;
+    private normalizeEmail;
+    private normalizePhone;
     private hashPassword;
     private verifyPassword;
     private createTokenResponse;
